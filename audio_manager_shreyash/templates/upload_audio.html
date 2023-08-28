@@ -1,0 +1,83 @@
+<html>
+<head>
+    <title>Audio Dashboard</title>
+    <style>
+        /* Center-align the dashboard content */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 0; /* 100% of viewport height */
+            margin: 0;
+        }
+
+        .dashboard-container {
+            display: center;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            height: 0; /* 100% of viewport height */
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Welcome to Shreyash Audio Management</h1>
+
+        <h1>Upload Audio Files</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="audio_files" multiple>
+            <input type="submit" value="Upload">
+        </form>
+
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <h2>Uploaded Audio Files:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Upload Date</th>
+                    <th>Extension</th>
+                    <th>Duration (mins)</th>
+                    <th>File Size (MB)</th>
+                    <th>Play</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for audio in audios %}
+                <tr>
+                    <td>{{ audio.file.name }}</td>
+                    <td>{{ audio.upload_date }}</td>
+                    <td>{{ audio.extension }}</td>
+                    <td>{{ audio.formatted_duration }}</td>
+
+                    <td>{{ audio.duration |floatformat:"2"}} mins</td>
+                    <td>{{ audio.file_size |filesizeformat }}</td>
+                    <td>
+                        <audio controls>
+                            <source src="{{ audio.file.url }}" type="audio/{{ audio.extension }}">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% if total_duration > 10 %}
+        <div class="warning">
+            <p>Warning: Total duration of your files exceeds 10 minutes!</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
